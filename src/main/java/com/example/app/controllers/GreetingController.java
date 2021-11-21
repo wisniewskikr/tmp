@@ -47,7 +47,7 @@ public class GreetingController {
 	}
 	
 	private static void setupDriver() {
-		String driverPath="agent//chromedriver";
+		String driverPath="/app/.chromedriver/bin/chromedriver";
 	    System.setProperty("webdriver.chrome.driver", driverPath);
 	    
 		ChromeOptions options = getChromeOptions();
