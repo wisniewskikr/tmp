@@ -47,6 +47,9 @@ public class GreetingController {
 	}
 	
 	private static void setupDriver() {
+		String driverPath="agent//chromedriver";
+	    System.setProperty("webdriver.chrome.driver", driverPath);
+	    
 		ChromeOptions options = getChromeOptions();
 		driver = new ChromeDriver(options);
 		wait = new WebDriverWait(driver, 20);
@@ -54,12 +57,14 @@ public class GreetingController {
 
 	private static ChromeOptions getChromeOptions() {
 		HashMap<String, Object> chromePrefs = new HashMap<>();
-		chromePrefs.put("download.default_directory", Paths.get("src","test","resources", "temporaryDownloads").toAbsolutePath().toString());
+//		chromePrefs.put("download.default_directory", Paths.get("src","test","resources", "temporaryDownloads").toAbsolutePath().toString());
 		ChromeOptions options = new ChromeOptions();
 		options.setExperimentalOption("prefs", chromePrefs);
 		DesiredCapabilities cap = DesiredCapabilities.chrome();
 		cap.setCapability(ChromeOptions.CAPABILITY, options);
 		options.addArguments("ignore-certificate-errors");
+		options.addArguments("--disable-gpu");
+        options.addArguments("--no-sandbox");
 		return options;
 	}
 	
