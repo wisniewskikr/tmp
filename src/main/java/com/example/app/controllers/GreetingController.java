@@ -65,6 +65,7 @@ public class GreetingController {
 		options.addArguments("ignore-certificate-errors");
 		options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
+        options.setBinary("/app/.apt/usr/bin/google-chrome");
 		return options;
 	}
 	
