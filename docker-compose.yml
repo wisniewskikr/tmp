@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+
+  service-discovery:
+    image: wisniewskikr/service-discovery-image
+    container_name: service-discovery-container
+    environment:
+      - spring.application.name=service-discovery
+      - server.port=8761
+      - eureka.client.fetch-registry=false
+      - eureka.client.register-with-eureka=false
+    ports:
+      - 8761:8761
+    healthcheck:
+      test: "exit 0"
+    networks:
+      - helloworld-network
+
+  service-helloworld:
+    image: wisniewskikr/service-helloworld-image
+    container_name: service-helloworld-container
+    environment:
+      - spring.application.name=service-helloworld
+      - server.port=8080
+      - eureka.client.service-url.defaultZone=http://service-discovery:8761/eureka
+      - management.endpoints.jmx.exposure.include=health,info,env,beans
+      - management.endpoints.web.exposure.include=health,info,env,beans
+      - service.helloworld.message=Hello World
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+    networks:
+      - helloworld-network
+
+  service-gateway:
+    image: wisniewskikr/service-gateway-image
+    container_name: service-gateway-container
+    environment:
+      - spring.application.name=service-gateway
+      - server.port=8762
+      - eureka.client.service-url.defaultZone=http://service-discovery:8761/eureka
+      - management.endpoint.gateway.enabled=true
+      - management.endpoints.web.exposure.include=gateway
+      - spring.cloud.gateway.routes[0].id=service-helloworld
+      - spring.cloud.gateway.routes[0].uri=lb://service-helloworld
+      - spring.cloud.gateway.routes[0].predicates[0]=Path=/**
+    ports:
+      - 8762:8762
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      service-helloworld:
+        condition: service_healthy
+    networks:
+      - helloworld-network  
+
+networks:
+  helloworld-network:
+    name: helloworld-network
